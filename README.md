@@ -24,7 +24,7 @@ git clone https://github.com/simon-alkhoury/currency-converter-api.git
 - The API will be available at `https://localhost:5098` (or as configured).
 
 6. **Run unit tests**
- - dotnet test CurrencyConverter.Api/CurrencyConverter.Tests
+ - dotnet test
 
 
 7. **Swagger UI**
