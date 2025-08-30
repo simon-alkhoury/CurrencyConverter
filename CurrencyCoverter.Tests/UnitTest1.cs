@@ -16,7 +16,11 @@ namespace CurrencyConverter.Tests
     {
         private FrankfurterService CreateService(IMemoryCache cache)
         {
+
+            
             var httpClient = new HttpClient(new MockHttpMessageHandler());
+            httpClient.BaseAddress = new Uri("https://api.frankfurter.app/");
+            httpClient.Timeout = TimeSpan.FromSeconds(30);
             var settings = Options.Create(new CurrencySettings { CacheDurationMinutes = 10 });
             var logger = new LoggerFactory().CreateLogger<FrankfurterService>();
             return new FrankfurterService(httpClient, cache, settings, logger);
