@@ -1,7 +1,9 @@
-﻿namespace CurrencyConverter.Api.Services.Interfaces
+﻿using CurrencyConverter.Api.Models;
+
+namespace CurrencyConverter.Api.Services.Interfaces
 {
     public interface ICurrencyProviderFactory
     {
-        IExchangeRateService GetProvider(string providerName = "frankfurter");
+        IExchangeRateService GetProvider(ExchangeServiceProvider exchangeServiceProvider);
     }
 }

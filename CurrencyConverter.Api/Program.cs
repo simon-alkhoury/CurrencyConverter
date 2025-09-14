@@ -163,7 +163,8 @@ builder.Services.Configure<CurrencySettings>(builder.Configuration.GetSection("C
 
 // ---------------------- Services DI ----------------------
 builder.Services.AddScoped<ICurrencyProviderFactory, CurrencyProviderFactory>();
-builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<ExchangeRateService>();
+builder.Services.AddScoped<IExchangeRateService, FixerService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 // ---------------------- OpenTelemetry ----------------------

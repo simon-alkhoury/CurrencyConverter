@@ -8,14 +8,15 @@ using CurrencyConverter.Api.Utilities;
 using Microsoft.AspNetCore.Mvc;
 namespace CurrencyConverter.Api.Services
 {
-    public class FrankfurterService : IExchangeRateService
+    public class FixerService : IExchangeRateService
     {
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
         private readonly CurrencySettings _settings;
-        private readonly ILogger<FrankfurterService> _logger;
+        private readonly ILogger<FixerService> _logger;
 
-        public ExchangeServiceProvider ProviderType => ExchangeServiceProvider.FranFurter;
+
+        public ExchangeServiceProvider ProviderType => ExchangeServiceProvider.Fixer;
 
         private static readonly HashSet<string> Excluded = new(StringComparer.OrdinalIgnoreCase)
             { "TRY", "PLN", "THB", "MXN" };
@@ -25,14 +26,14 @@ namespace CurrencyConverter.Api.Services
             PropertyNameCaseInsensitive = true
         };
 
-        public FrankfurterService(HttpClient httpClient, IMemoryCache cache, IOptions<CurrencySettings> settings, ILogger<FrankfurterService> logger)
+        public FixerService(HttpClient httpClient, IMemoryCache cache, IOptions<CurrencySettings> settings, ILogger<FixerService> logger)
         {
             _httpClient = httpClient;
             _cache = cache;
             _settings = settings.Value;
             _logger = logger;
 
-            _logger.LogInformation("FrankfurterService initialized with BaseAddress: {BaseAddress}",
+            _logger.LogInformation("FixerService initialized with BaseAddress: {BaseAddress}",
                 _httpClient.BaseAddress?.ToString() ?? "NULL");
         }
 
@@ -116,10 +117,10 @@ namespace CurrencyConverter.Api.Services
         public async Task<PagedResponse<KeyValuePair<DateTime, ExchangeRateResponse>>> GetHistoricalRatesAsync(HistoricalRatesRequest request)
         {
             string cacheKey = $"hist-{request.Base}-{request.StartDate:yyyyMMdd}-{request.EndDate:yyyyMMdd}";
-            if (_cache.TryGetValue(cacheKey, out List<KeyValuePair<DateTime, ExchangeRateResponse>>? cached) && cached !=null)
+            if (_cache.TryGetValue(cacheKey, out List<KeyValuePair<DateTime, ExchangeRateResponse>>? cached) && cached != null)
             {
                 _logger.LogInformation("Cache hit for {CacheKey}", cacheKey);
-                return Utilities.Utilities.Paginate(cached , request);
+                return Utilities.Utilities.Paginate(cached, request);
             }
 
             try
@@ -163,7 +164,7 @@ namespace CurrencyConverter.Api.Services
 
                 var allItems = dict.OrderBy(kv => kv.Key).ToList();
 
-                var result =  Utilities.Utilities.Paginate(allItems, request);
+                var result = Utilities.Utilities.Paginate(allItems, request);
 
 
                 _cache.Set(cacheKey, allItems, TimeSpan.FromMinutes(_settings.CacheDurationMinutes));

@@ -75,4 +75,10 @@
         public DateTime ExpiresAt { get; set; }
         public string Role { get; set; } = string.Empty;
     }
+
+    public enum ExchangeServiceProvider
+    {
+        FranFurter,
+        Fixer
+    }
 }

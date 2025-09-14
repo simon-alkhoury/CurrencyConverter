@@ -1,4 +1,5 @@
 ﻿using CurrencyConverter.Api.Models;
+using CurrencyConverter.Api.Services;
 using CurrencyConverter.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 [Authorize(Policy = "UserOrAdmin")]
 public class CurrencyController : ControllerBase
 {
-    private readonly ICurrencyService _currencyService;
+    private readonly ExchangeRateService _exchangeRateService;
     private readonly ILogger<CurrencyController> _logger;
 
-    public CurrencyController(ICurrencyService currencyService, ILogger<CurrencyController> logger)
+    public CurrencyController(ExchangeRateService exchangeRateService, ILogger<CurrencyController> logger)
     {
-        _currencyService = currencyService;
+        _exchangeRateService = exchangeRateService;
         _logger = logger;
     }
 
@@ -23,7 +24,7 @@ public class CurrencyController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<ExchangeRateResponse>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<ExchangeRateResponse>>> GetLatestRates([FromQuery] string baseCurrency = "EUR")
     {
-        var rates = await _currencyService.GetLatestRatesAsync(baseCurrency);
+        var rates = await _exchangeRateService.GetLatestRatesAsync(baseCurrency,ExchangeServiceProvider.FranFurter);
 
         return Ok(new ApiResponse<ExchangeRateResponse>
         {
@@ -41,7 +42,7 @@ public class CurrencyController : ControllerBase
         if (CurrencyGuards.InvolvesExcluded(request.From, request.To))
             throw new ArgumentException("Currency conversion not supported for excluded currencies (TRY, PLN, THB, MXN).");
 
-        var result = await _currencyService.ConvertCurrencyAsync(request);
+        var result = await _exchangeRateService.ConvertCurrencyAsync(request, ExchangeServiceProvider.FranFurter);
 
         if (result == null)
         {
@@ -84,7 +85,7 @@ public class CurrencyController : ControllerBase
             PageSize = pageSize
         };
 
-        var paged = await _currencyService.GetHistoricalRatesAsync(req);
+        var paged = await _exchangeRateService.GetHistoricalRatesAsync(req, ExchangeServiceProvider.FranFurter);
 
         return Ok(new ApiResponse<PagedResponse<KeyValuePair<DateTime, ExchangeRateResponse>>>
         {
